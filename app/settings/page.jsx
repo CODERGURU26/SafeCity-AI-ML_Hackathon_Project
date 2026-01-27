@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppShell } from "@/components/layout/app-shell"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,8 @@ import {
 } from "lucide-react"
 
 export default function SettingsPage() {
+  const [mounted, setMounted] = useState(false)
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: true,
@@ -44,6 +46,77 @@ export default function SettingsPage() {
     showPatrols: true,
     clusterMarkers: true,
   })
+
+  const [appearance, setAppearance] = useState({
+    accentColor: "#00d9ff",
+  })
+
+  // All hooks must be defined first - Initialize and load saved settings
+  useEffect(() => {
+    setMounted(true)
+    
+    // Load appearance settings from localStorage
+    const savedAppearance = localStorage.getItem("appearance-settings")
+    if (savedAppearance) {
+      try {
+        const parsed = JSON.parse(savedAppearance)
+        setAppearance(parsed)
+        // Apply saved accent color
+        if (parsed.accentColor) {
+          document.documentElement.style.setProperty("--primary", parsed.accentColor)
+        }
+      } catch (e) {
+        console.error("Failed to load appearance settings:", e)
+      }
+    }
+    
+    // Load notification settings from localStorage
+    const savedNotifications = localStorage.getItem("notification-settings")
+    if (savedNotifications) {
+      try {
+        setNotifications(JSON.parse(savedNotifications))
+      } catch (e) {
+        console.error("Failed to load notification settings:", e)
+      }
+    }
+    
+    // Load map settings from localStorage
+    const savedMapSettings = localStorage.getItem("map-settings")
+    if (savedMapSettings) {
+      try {
+        setMapSettings(JSON.parse(savedMapSettings))
+      } catch (e) {
+        console.error("Failed to load map settings:", e)
+      }
+    }
+  }, [])
+
+  // Save appearance settings to localStorage
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("appearance-settings", JSON.stringify(appearance))
+    }
+  }, [appearance, mounted])
+
+  // Save notification settings to localStorage
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("notification-settings", JSON.stringify(notifications))
+    }
+  }, [notifications, mounted])
+
+  // Save map settings to localStorage
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("map-settings", JSON.stringify(mapSettings))
+    }
+  }, [mapSettings, mounted])
+
+  const handleAccentColorChange = (color) => {
+    setAppearance({ ...appearance, accentColor: color })
+    // Apply accent color via CSS variable
+    document.documentElement.style.setProperty("--primary", color)
+  }
 
   return (
     <AppShell>
@@ -448,75 +521,56 @@ export default function SettingsPage() {
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-foreground">Appearance Settings</CardTitle>
-                <CardDescription className="text-muted-foreground">
+                {/* <CardDescription className="text-muted-foreground">
                   Customize the look and feel of the application
-                </CardDescription>
+                </CardDescription> */}
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Theme */}
-                <div className="space-y-3">
-                  <Label className="text-foreground">Theme</Label>
-                  <div className="grid grid-cols-3 gap-4">
-                    <button className="flex flex-col items-center gap-2 rounded-lg border-2 border-primary bg-card p-4 transition-colors">
-                      <div className="h-12 w-12 rounded-lg bg-[#0a0e1a]"></div>
-                      <span className="text-sm font-medium text-foreground">Cyberpunk Dark</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50">
-                      <div className="h-12 w-12 rounded-lg bg-[#1a1f2e]"></div>
-                      <span className="text-sm font-medium text-foreground">Midnight</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50">
-                      <div className="h-12 w-12 rounded-lg bg-slate-100"></div>
-                      <span className="text-sm font-medium text-foreground">Light</span>
-                    </button>
-                  </div>
-                </div>
-
-                <Separator className="bg-border" />
-
                 {/* Accent Color */}
                 <div className="space-y-3">
                   <Label className="text-foreground">Accent Color</Label>
                   <div className="flex gap-3">
-                    <button className="h-10 w-10 rounded-full bg-[#00d9ff] ring-2 ring-foreground ring-offset-2 ring-offset-background"></button>
-                    <button className="h-10 w-10 rounded-full bg-[#ff4081] hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"></button>
-                    <button className="h-10 w-10 rounded-full bg-[#00e676] hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"></button>
-                    <button className="h-10 w-10 rounded-full bg-[#ffd600] hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"></button>
-                    <button className="h-10 w-10 rounded-full bg-[#7c4dff] hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"></button>
+                    <button
+                      onClick={() => handleAccentColorChange("#00d9ff")}
+                      className={`h-10 w-10 rounded-full bg-[#00d9ff] transition-all ${
+                        appearance.accentColor === "#00d9ff"
+                          ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                          : ""
+                      }`}
+                    ></button>
+                    <button
+                      onClick={() => handleAccentColorChange("#ff4081")}
+                      className={`h-10 w-10 rounded-full bg-[#ff4081] transition-all ${
+                        appearance.accentColor === "#ff4081"
+                          ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                          : "hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"
+                      }`}
+                    ></button>
+                    <button
+                      onClick={() => handleAccentColorChange("#00e676")}
+                      className={`h-10 w-10 rounded-full bg-[#00e676] transition-all ${
+                        appearance.accentColor === "#00e676"
+                          ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                          : "hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"
+                      }`}
+                    ></button>
+                    <button
+                      onClick={() => handleAccentColorChange("#ffd600")}
+                      className={`h-10 w-10 rounded-full bg-[#ffd600] transition-all ${
+                        appearance.accentColor === "#ffd600"
+                          ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                          : "hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"
+                      }`}
+                    ></button>
+                    <button
+                      onClick={() => handleAccentColorChange("#7c4dff")}
+                      className={`h-10 w-10 rounded-full bg-[#7c4dff] transition-all ${
+                        appearance.accentColor === "#7c4dff"
+                          ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                          : "hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"
+                      }`}
+                    ></button>
                   </div>
-                </div>
-
-                <Separator className="bg-border" />
-
-                {/* Font Size */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-foreground">Font Size</Label>
-                    <span className="text-sm text-muted-foreground">Medium</span>
-                  </div>
-                  <Slider defaultValue={[50]} max={100} step={25} className="w-full" />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Small</span>
-                    <span>Medium</span>
-                    <span>Large</span>
-                  </div>
-                </div>
-
-                <Separator className="bg-border" />
-
-                {/* Density */}
-                <div className="space-y-2">
-                  <Label className="text-foreground">Interface Density</Label>
-                  <Select defaultValue="comfortable">
-                    <SelectTrigger className="bg-secondary border-border text-foreground">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="compact" className="text-foreground focus:bg-secondary">Compact</SelectItem>
-                      <SelectItem value="comfortable" className="text-foreground focus:bg-secondary">Comfortable</SelectItem>
-                      <SelectItem value="spacious" className="text-foreground focus:bg-secondary">Spacious</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </CardContent>
             </Card>
