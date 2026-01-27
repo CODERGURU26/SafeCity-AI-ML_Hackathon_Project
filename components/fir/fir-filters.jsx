@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -13,10 +12,7 @@ import {
 import { Search, Filter, Download, Plus, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-export function FIRFilters() {
-  const [activeFilters, setActiveFilters] = useState([])
-  const [searchQuery, setSearchQuery] = useState("")
-
+export function FIRFilters({ activeFilters, setActiveFilters, searchQuery, setSearchQuery }) {
   const addFilter = (type, value) => {
     if (value && value !== "all") {
       const existing = activeFilters.find((f) => f.type === type)

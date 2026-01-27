@@ -1,9 +1,15 @@
+"use client"
+
+import { useState } from "react"
 import { AppShell } from "@/components/layout/app-shell"
 import { FIRTable } from "@/components/fir/fir-table"
 import { FIRFilters } from "@/components/fir/fir-filters"
 import { FIRStats } from "@/components/fir/fir-stats"
 
 export default function FIRDataPage() {
+  const [activeFilters, setActiveFilters] = useState([])
+  const [searchQuery, setSearchQuery] = useState("")
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -17,10 +23,18 @@ export default function FIRDataPage() {
         <FIRStats />
 
         {/* Filters */}
-        <FIRFilters />
+        <FIRFilters 
+          activeFilters={activeFilters}
+          setActiveFilters={setActiveFilters}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
 
         {/* Table */}
-        <FIRTable />
+        <FIRTable 
+          activeFilters={activeFilters}
+          searchQuery={searchQuery}
+        />
 
         {/* Pagination */}
         <div className="flex items-center justify-between">

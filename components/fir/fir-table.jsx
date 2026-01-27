@@ -137,8 +137,31 @@ const getPriorityBadge = (priority) => {
   }
 }
 
-export function FIRTable() {
+export function FIRTable({ activeFilters = [], searchQuery = "" }) {
   const [selectedRows, setSelectedRows] = useState([])
+
+  // Filter the data based on search query and active filters
+  const filteredData = firData.filter((fir) => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      const matchesSearch = 
+        fir.id.toLowerCase().includes(query) ||
+        fir.complainant.toLowerCase().includes(query) ||
+        fir.location.toLowerCase().includes(query)
+      
+      if (!matchesSearch) return false
+    }
+
+    // Active filters
+    for (const filter of activeFilters) {
+      if (filter.type === "status" && fir.status !== filter.value) return false
+      if (filter.type === "type" && fir.type.toLowerCase() !== filter.value.toLowerCase()) return false
+      if (filter.type === "priority" && fir.priority !== filter.value) return false
+    }
+
+    return true
+  })
 
   const toggleRow = (id) => {
     setSelectedRows((prev) =>
@@ -148,7 +171,7 @@ export function FIRTable() {
 
   const toggleAll = () => {
     setSelectedRows((prev) =>
-      prev.length === firData.length ? [] : firData.map((row) => row.id)
+      prev.length === filteredData.length ? [] : filteredData.map((row) => row.id)
     )
   }
 
@@ -159,7 +182,7 @@ export function FIRTable() {
           <TableRow className="border-border hover:bg-transparent">
             <TableHead className="w-12">
               <Checkbox
-                checked={selectedRows.length === firData.length}
+                checked={selectedRows.length === filteredData.length && filteredData.length > 0}
                 onCheckedChange={toggleAll}
                 className="border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
@@ -176,7 +199,14 @@ export function FIRTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {firData.map((fir) => (
+          {filteredData.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan="10" className="text-center py-8 text-muted-foreground">
+                No results found
+              </TableCell>
+            </TableRow>
+          ) : (
+            filteredData.map((fir) => (
             <TableRow
               key={fir.id}
               className="border-border hover:bg-secondary/50 transition-colors"
@@ -229,7 +259,8 @@ export function FIRTable() {
                 </DropdownMenu>
               </TableCell>
             </TableRow>
-          ))}
+          ))
+          )}
         </TableBody>
       </Table>
     </div>
