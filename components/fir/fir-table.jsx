@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Table,
   TableBody,
@@ -109,6 +109,270 @@ const firData = [
     priority: "high",
     officer: "SI Jadhav",
   },
+  {
+    id: "FIR-2024-1839",
+    date: "2024-01-25",
+    time: "19:15",
+    type: "Theft",
+    location: "Lower Parel",
+    complainant: "Kapil Sharma",
+    status: "open",
+    priority: "medium",
+    officer: "SI Patil",
+  },
+  {
+    id: "FIR-2024-1838",
+    date: "2024-01-25",
+    time: "17:30",
+    type: "Robbery",
+    location: "Colaba",
+    complainant: "Arjun Nair",
+    status: "closed",
+    priority: "high",
+    officer: "SI Deshmukh",
+  },
+  {
+    id: "FIR-2024-1837",
+    date: "2024-01-25",
+    time: "15:45",
+    type: "Fraud",
+    location: "Vile Parle",
+    complainant: "Meera Patel",
+    status: "investigating",
+    priority: "medium",
+    officer: "SI Kulkarni",
+  },
+  {
+    id: "FIR-2024-1836",
+    date: "2024-01-25",
+    time: "14:20",
+    type: "Vandalism",
+    location: "Thane",
+    complainant: "Rohit Gupta",
+    status: "open",
+    priority: "low",
+    officer: "SI Jadhav",
+  },
+  {
+    id: "FIR-2024-1835",
+    date: "2024-01-25",
+    time: "12:00",
+    type: "Cyber Crime",
+    location: "Fort",
+    complainant: "Divya Reddy",
+    status: "investigating",
+    priority: "high",
+    officer: "SI Patil",
+  },
+  {
+    id: "FIR-2024-1834",
+    date: "2024-01-24",
+    time: "20:30",
+    type: "Theft",
+    location: "Borivali",
+    complainant: "Sanjay Kumar",
+    status: "closed",
+    priority: "low",
+    officer: "SI Deshmukh",
+  },
+  {
+    id: "FIR-2024-1833",
+    date: "2024-01-24",
+    time: "18:45",
+    type: "Assault",
+    location: "Navi Mumbai",
+    complainant: "Pooja Singh",
+    status: "open",
+    priority: "high",
+    officer: "SI Kulkarni",
+  },
+  {
+    id: "FIR-2024-1832",
+    date: "2024-01-24",
+    time: "16:15",
+    type: "Robbery",
+    location: "Dombivali",
+    complainant: "Vikram Verma",
+    status: "investigating",
+    priority: "high",
+    officer: "SI Jadhav",
+  },
+  {
+    id: "FIR-2024-1831",
+    date: "2024-01-24",
+    time: "14:50",
+    type: "Fraud",
+    location: "Panvel",
+    complainant: "Anjali Sharma",
+    status: "open",
+    priority: "medium",
+    officer: "SI Patil",
+  },
+  {
+    id: "FIR-2024-1830",
+    date: "2024-01-24",
+    time: "13:30",
+    type: "Cyber Crime",
+    location: "Airoli",
+    complainant: "Rohan Patel",
+    status: "closed",
+    priority: "medium",
+    officer: "SI Deshmukh",
+  },
+  {
+    id: "FIR-2024-1829",
+    date: "2024-01-24",
+    time: "11:45",
+    type: "Vandalism",
+    location: "Kalyan",
+    complainant: "Sunita Desai",
+    status: "investigating",
+    priority: "low",
+    officer: "SI Kulkarni",
+  },
+  {
+    id: "FIR-2024-1828",
+    date: "2024-01-23",
+    time: "20:20",
+    type: "Theft",
+    location: "Ulhasnagar",
+    complainant: "Manoj Reddy",
+    status: "open",
+    priority: "high",
+    officer: "SI Jadhav",
+  },
+  {
+    id: "FIR-2024-1827",
+    date: "2024-01-23",
+    time: "19:00",
+    type: "Assault",
+    location: "Ambernath",
+    complainant: "Priya Sharma",
+    status: "open",
+    priority: "medium",
+    officer: "SI Patil",
+  },
+  {
+    id: "FIR-2024-1826",
+    date: "2024-01-23",
+    time: "17:30",
+    type: "Robbery",
+    location: "Badlapur",
+    complainant: "Harshad Singh",
+    status: "closed",
+    priority: "high",
+    officer: "SI Deshmukh",
+  },
+  {
+    id: "FIR-2024-1825",
+    date: "2024-01-23",
+    time: "16:00",
+    type: "Fraud",
+    location: "Khopoli",
+    complainant: "Kavya Gupta",
+    status: "investigating",
+    priority: "low",
+    officer: "SI Kulkarni",
+  },
+  {
+    id: "FIR-2024-1824",
+    date: "2024-01-23",
+    time: "14:45",
+    type: "Cyber Crime",
+    location: "Matheran",
+    complainant: "Anil Verma",
+    status: "open",
+    priority: "high",
+    officer: "SI Jadhav",
+  },
+  {
+    id: "FIR-2024-1823",
+    date: "2024-01-23",
+    time: "13:15",
+    type: "Vandalism",
+    location: "Raigad",
+    complainant: "Rita Patel",
+    status: "investigating",
+    priority: "medium",
+    officer: "SI Patil",
+  },
+  {
+    id: "FIR-2024-1822",
+    date: "2024-01-22",
+    time: "20:00",
+    type: "Theft",
+    location: "Raigarh",
+    complainant: "Saurabh Kumar",
+    status: "closed",
+    priority: "low",
+    officer: "SI Deshmukh",
+  },
+  {
+    id: "FIR-2024-1821",
+    date: "2024-01-22",
+    time: "18:30",
+    type: "Assault",
+    location: "Satara",
+    complainant: "Deepti Sharma",
+    status: "open",
+    priority: "high",
+    officer: "SI Kulkarni",
+  },
+  {
+    id: "FIR-2024-1820",
+    date: "2024-01-22",
+    time: "17:00",
+    type: "Robbery",
+    location: "Kolhapur",
+    complainant: "Nikhil Singh",
+    status: "investigating",
+    priority: "high",
+    officer: "SI Jadhav",
+  },
+  {
+    id: "FIR-2024-1819",
+    date: "2024-01-22",
+    time: "15:30",
+    type: "Fraud",
+    location: "Sangli",
+    complainant: "Nisha Gupta",
+    status: "open",
+    priority: "medium",
+    officer: "SI Patil",
+  },
+  {
+    id: "FIR-2024-1818",
+    date: "2024-01-22",
+    time: "14:00",
+    type: "Cyber Crime",
+    location: "Chiplun",
+    complainant: "Vikram Reddy",
+    status: "closed",
+    priority: "medium",
+    officer: "SI Deshmukh",
+  },
+  {
+    id: "FIR-2024-1817",
+    date: "2024-01-22",
+    time: "12:45",
+    type: "Vandalism",
+    location: "Belgaum",
+    complainant: "Swetha Patel",
+    status: "investigating",
+    priority: "low",
+    officer: "SI Kulkarni",
+  },
+  {
+    id: "FIR-2024-1816",
+    date: "2024-01-21",
+    time: "20:15",
+    type: "Theft",
+    location: "Belgaum City",
+    complainant: "Rajeev Kumar",
+    status: "open",
+    priority: "high",
+    officer: "SI Jadhav",
+  },
 ]
 
 const getStatusBadge = (status) => {
@@ -137,7 +401,7 @@ const getPriorityBadge = (priority) => {
   }
 }
 
-export function FIRTable({ activeFilters = [], searchQuery = "" }) {
+export function FIRTable({ activeFilters = [], searchQuery = "", currentPage = 1, itemsPerPage = 8, onTotalItemsChange }) {
   const [selectedRows, setSelectedRows] = useState([])
 
   // Filter the data based on search query and active filters
@@ -163,6 +427,19 @@ export function FIRTable({ activeFilters = [], searchQuery = "" }) {
     return true
   })
 
+  // Calculate pagination
+  const totalItems = filteredData.length
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedData = filteredData.slice(startIndex, endIndex)
+
+  // Notify parent of total items count
+  useEffect(() => {
+    if (onTotalItemsChange) {
+      onTotalItemsChange(totalItems)
+    }
+  }, [filteredData.length, onTotalItemsChange])
+
   const toggleRow = (id) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
@@ -171,7 +448,7 @@ export function FIRTable({ activeFilters = [], searchQuery = "" }) {
 
   const toggleAll = () => {
     setSelectedRows((prev) =>
-      prev.length === filteredData.length ? [] : filteredData.map((row) => row.id)
+      prev.length === paginatedData.length ? [] : paginatedData.map((row) => row.id)
     )
   }
 
@@ -182,7 +459,7 @@ export function FIRTable({ activeFilters = [], searchQuery = "" }) {
           <TableRow className="border-border hover:bg-transparent">
             <TableHead className="w-12">
               <Checkbox
-                checked={selectedRows.length === filteredData.length && filteredData.length > 0}
+                checked={selectedRows.length === paginatedData.length && paginatedData.length > 0}
                 onCheckedChange={toggleAll}
                 className="border-muted-foreground data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
@@ -199,14 +476,14 @@ export function FIRTable({ activeFilters = [], searchQuery = "" }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredData.length === 0 ? (
+          {paginatedData.length === 0 ? (
             <TableRow>
               <TableCell colSpan="10" className="text-center py-8 text-muted-foreground">
                 No results found
               </TableCell>
             </TableRow>
           ) : (
-            filteredData.map((fir) => (
+            paginatedData.map((fir) => (
             <TableRow
               key={fir.id}
               className="border-border hover:bg-secondary/50 transition-colors"
