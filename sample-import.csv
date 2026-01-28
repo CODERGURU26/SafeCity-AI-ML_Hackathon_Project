@@ -1,0 +1,9 @@
+Date,Time,Type,Location,Complainant,Officer,Status,Priority,Description,Evidence,Notes
+2024-01-27,14:32,Theft,Andheri West,Rajesh Kumar,SI Patil,open,high,Mobile phone stolen from pocket at local market,CCTV footage from market,Incident occurred on Sunday evening
+2024-01-27,15:00,Assault,Bandra,Priya Sharma,SI Deshmukh,investigating,high,Physical altercation at residential complex,Witness statements from neighbors,Multiple injuries reported
+2024-01-27,16:15,Fraud,Powai,Amit Verma,SI Kulkarni,open,medium,Online payment scam through fake website,Transaction screenshots,Amount lost: 5000 rupees
+2024-01-27,17:45,Robbery,Kurla,Vikram Singh,SI Jadhav,closed,high,Cash robbery at ATM,ATM camera footage,Suspect identified and arrested
+2024-01-27,18:20,Cyber Crime,Fort,Divya Reddy,SI Patil,investigating,high,Email account hacked and misused,Email access logs,Investigation ongoing
+2024-01-27,19:30,Vandalism,Dadar,Neha Gupta,SI Deshmukh,open,medium,Graffiti on residential wall,Photos of vandalism,No suspects yet
+2024-01-27,20:45,Theft,Lower Parel,Kapil Sharma,SI Kulkarni,open,low,Bicycle stolen from building premises,Building security footage,Value estimated at 3000 rupees
+2024-01-27,21:15,Assault,Thane,Sunita Desai,SI Jadhav,investigating,medium,Road rage incident at traffic intersection,Dashcam footage from nearby vehicle,Minor injuries to both parties
