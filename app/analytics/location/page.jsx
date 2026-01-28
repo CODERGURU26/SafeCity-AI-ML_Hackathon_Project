@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation"
 import { AppShell } from "@/components/layout/app-shell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+
+export const dynamic = 'force-dynamic'
 import {
     LineChart,
     Line,

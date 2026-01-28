@@ -7,6 +7,8 @@ import { PredictiveInsightsAnalytics } from "@/components/analytics/predictive-i
 import { Card, CardContent } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, Target, AlertCircle } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+
 const analyticsStats = [
   {
     title: "Total Incidents",
