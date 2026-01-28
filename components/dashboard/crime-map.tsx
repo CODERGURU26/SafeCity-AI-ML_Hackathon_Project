@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Layers, ZoomIn, ZoomOut, Maximize2, Filter } from "lucide-react"
+import { Layers, ZoomIn, ZoomOut, Maximize2, Filter, BarChart3 } from "lucide-react"
 
 // Dynamically import leaflet components with SSR disabled
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false })
@@ -44,6 +46,7 @@ const zoneConfig: Record<Level, { color: string; radius: number }> = {
 export function CrimeMap() {
   const [crimeHotspots, setCrimeHotspots] = useState<Hotspot[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/zones")
@@ -57,6 +60,10 @@ export function CrimeMap() {
         setLoading(false)
       })
   }, [])
+
+  const handleLocationClick = (city: string) => {
+    router.push(`/analytics/location?location=${encodeURIComponent(city)}`)
+  }
 
   return (
     <Card className="col-span-2 bg-card border-border">
@@ -96,7 +103,7 @@ export function CrimeMap() {
                   }}
                 >
                   <Popup>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <h3 className="font-semibold capitalize">{spot.City}</h3>
                       <p className="text-sm">
                         Police Needed: {spot.police_needed}
@@ -114,6 +121,15 @@ export function CrimeMap() {
                       >
                         {spot.risk_zone.toUpperCase()} RISK
                       </Badge>
+
+                      <Button
+                        size="sm"
+                        onClick={() => handleLocationClick(spot.City)}
+                        className="w-full mt-2 gap-2"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        View Analysis
+                      </Button>
                     </div>
                   </Popup>
                 </Circle>
