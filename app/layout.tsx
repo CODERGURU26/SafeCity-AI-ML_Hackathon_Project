@@ -11,7 +11,7 @@ const _inter = Inter({ subsets: ["latin"] });
 const _jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'SafeCity - Smart Crime Mapping & Predictive Policing',
+  title: 'Sanjay - Smart Crime Mapping & Predictive Policing',
   description: 'Advanced crime mapping and predictive policing platform for safer communities',
   generator: 'v0.app',
   icons: {

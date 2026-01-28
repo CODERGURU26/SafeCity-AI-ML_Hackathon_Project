@@ -4,10 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, RotateCcw, Check } from "lucide-react"
-import { format } from "date-fns"
+import { RotateCcw, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const crimeTypes = [
@@ -25,6 +22,10 @@ export function QuickFilters({ onApplyFilters, onResetFilters }) {
 
   const handleReset = () => {
     setCrimeType("all")
+    // Immediately apply reset
+    if (onApplyFilters) {
+      onApplyFilters({ crimeType: "all" })
+    }
     if (onResetFilters) {
       onResetFilters()
     }
@@ -32,10 +33,17 @@ export function QuickFilters({ onApplyFilters, onResetFilters }) {
 
   const handleApply = () => {
     if (onApplyFilters) {
-      onApplyFilters({
-        crimeType,
-      })
+      onApplyFilters({ crimeType })
     }
+  }
+
+  // Apply filter immediately on selection (optional - better UX)
+  const handleCrimeTypeChange = (value) => {
+    setCrimeType(value)
+    // Uncomment below to apply filters immediately without clicking "Apply"
+    // if (onApplyFilters) {
+    //   onApplyFilters({ crimeType: value })
+    // }
   }
 
   return (
@@ -58,11 +66,11 @@ export function QuickFilters({ onApplyFilters, onResetFilters }) {
         {/* Crime Type */}
         <div className="space-y-2">
           <Label className="text-sm text-muted-foreground">Crime Type</Label>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
             {crimeTypes.map((type) => (
               <button
                 key={type.value}
-                onClick={() => setCrimeType(type.value)}
+                onClick={() => handleCrimeTypeChange(type.value)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
                   crimeType === type.value

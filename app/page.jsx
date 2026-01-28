@@ -52,7 +52,7 @@ export default function DashboardPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-foreground">Map</h1>
           <p className="text-muted-foreground">Real-time crime monitoring and analytics</p>
         </div>
 
