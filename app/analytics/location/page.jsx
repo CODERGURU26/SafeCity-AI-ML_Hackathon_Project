@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { useSearchParams } from "next/navigation"
 import { AppShell } from "@/components/layout/app-shell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -26,15 +25,25 @@ import Link from "next/link"
 const COLORS = ["#00C49F", "#0088FE", "#FFBB28", "#FF8042", "#FF6B9D", "#C44569", "#1B9CFC"]
 
 export default function LocationAnalyticsPage() {
-    const searchParams = useSearchParams()
-    const location = searchParams.get("location") || "Andheri"
-
+    // Get location from URL on client side only
+    const [location, setLocation] = useState("Andheri")
     const [timeframeData, setTimeframeData] = useState([])
     const [crimeTypeData, setCrimeTypeData] = useState([])
     const [hourlyData, setHourlyData] = useState([])
     const [stats, setStats] = useState({})
     const [timeframe, setTimeframe] = useState("monthly")
     const [selectedCrimeType, setSelectedCrimeType] = useState(null)
+
+    // Get location from URL on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search)
+            const locationParam = params.get("location")
+            if (locationParam) {
+                setLocation(locationParam)
+            }
+        }
+    }, [])
 
     // Simulated data for the location
     const generateLocationData = useCallback(() => {
@@ -115,7 +124,7 @@ export default function LocationAnalyticsPage() {
 
     useEffect(() => {
         generateLocationData()
-    }, [location, timeframe])
+    }, [location, timeframe, generateLocationData])
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {

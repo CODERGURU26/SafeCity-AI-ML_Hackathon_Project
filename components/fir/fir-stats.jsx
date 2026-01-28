@@ -31,28 +31,31 @@ export function FIRStats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
-        // Fetch all FIRs without pagination to calculate stats
-        const response = await fetch(`${API_BASE}/api/fir?limit=10000`)
+        // Mock FIR data for stats calculation
+        const mockFirs = [
+          { id: "FIR001", status: "open", priority: "high" },
+          { id: "FIR002", status: "open", priority: "medium" },
+          { id: "FIR003", status: "closed", priority: "low" },
+          { id: "FIR004", status: "open", priority: "high" },
+          { id: "FIR005", status: "closed", priority: "high" },
+          { id: "FIR006", status: "open", priority: "low" },
+          { id: "FIR007", status: "closed", priority: "medium" },
+          { id: "FIR008", status: "open", priority: "high" },
+          { id: "FIR009", status: "closed", priority: "high" },
+          { id: "FIR010", status: "open", priority: "medium" },
+        ]
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch stats")
-        }
-
-        const data = await response.json()
-        const firs = data.data || []
-
-        // Calculate stats from actual data
+        // Calculate stats from mock data
         const statsData = {
-          total: data.pagination?.total || firs.length,
-          open: firs.filter((fir) => fir.status === "open").length,
-          resolved: firs.filter((fir) => fir.status === "closed").length,
-          highPriority: firs.filter((fir) => fir.priority === "high").length,
+          total: mockFirs.length,
+          open: mockFirs.filter((fir) => fir.status === "open").length,
+          resolved: mockFirs.filter((fir) => fir.status === "closed").length,
+          highPriority: mockFirs.filter((fir) => fir.priority === "high").length,
         }
 
         setStats(statsData)
       } catch (error) {
-        console.error("Error fetching stats:", error)
+        console.error("Error calculating stats:", error)
       } finally {
         setLoading(false)
       }

@@ -1,8 +1,7 @@
 "use client"
 
-import { Bell, Search, User, MapPin } from "lucide-react"
+import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,29 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
 
 export function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      {/* Search */}
+      {/* Left Section */}
       <div className="flex items-center gap-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search locations, cases..."
-            className="w-80 bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:ring-primary"
-          />
-        </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex items-center gap-4">
-        {/* Location Indicator */}
-        <div className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5">
-          <MapPin className="h-4 w-4 text-primary" />
-          <span className="text-sm text-foreground">Mumbai, MH</span>
-        </div>
-
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -62,29 +45,24 @@ export function Topbar() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
 
-        {/* User Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <User className="h-4 w-4 text-primary" />
-              </div>
-              <div className="hidden flex-col items-start md:flex">
-                <span className="text-sm font-medium text-foreground">Inspector Shah</span>
-                <span className="text-xs text-muted-foreground">Zone 4 Command</span>
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-card border-border">
-            <DropdownMenuLabel className="text-foreground">My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="text-foreground focus:bg-secondary">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="text-foreground focus:bg-secondary">Settings</DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="text-destructive focus:bg-secondary">Logout</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {/* Center Section */}
+      <div className="flex items-center">
+   
+          <div className="text-center">
+            <p className="text-sm font-bold text-foreground">Mira-Bhyandar Police Department</p>
+          </div>
+        
+      </div>
+
+      {/* Right Section */}
+      <div className="flex items-center gap-4">
+        <Card className="px-4 py-2 bg-secondary border-border">
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">5 Active Centers</p>
+          </div>
+        </Card>
       </div>
     </header>
   )
