@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,8 +12,10 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
+  Minimize2,
   Filter,
   BarChart3,
+  X,
 } from "lucide-react";
 
 // Dynamically import leaflet components with SSR disabled
@@ -66,10 +67,8 @@ const zoneConfig: Record<Level, { color: string; radius: number }> = {
 };
 
 // =======================
-// Fallback data for when API is unavailable
+// Fallback data
 // =======================
-// Use the hardcoded dataset provided by the user.
-// Assign `police_needed` based on risk level: High=8, Medium=5, Low=3
 const policeByRisk: Record<Level, number> = {
   High: 8,
   Medium: 5,
@@ -348,10 +347,17 @@ const FALLBACK_HOTSPOTS: Hotspot[] = [
 // =======================
 // Main Component
 // =======================
-export function CrimeMap() {
+interface CrimeMapProps {
+  filters?: {
+    crimeType: string;
+  };
+}
+
+export function CrimeMap({ filters }: CrimeMapProps) {
   const [crimeHotspots, setCrimeHotspots] = useState<Hotspot[]>([]);
   const [loading, setLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const mapRef = useRef(null);
@@ -362,14 +368,34 @@ export function CrimeMap() {
 
   useEffect(() => {
     if (!isClient) return;
-    // Use the hardcoded dataset (no API calls)
     setCrimeHotspots(FALLBACK_HOTSPOTS);
     setLoading(false);
     setError(null);
   }, [isClient]);
 
+  // Filter hotspots based on selected risk level
+  const filteredHotspots = crimeHotspots.filter((spot) => {
+    if (!filters || filters.crimeType === "all") return true;
+
+    const filterMapping: Record<string, Level> = {
+      theft: "Low",
+      assault: "Medium",
+      robbery: "High",
+      fraud: "Low",
+      vandalism: "Low",
+      cyber: "Medium",
+    };
+
+    const targetRiskZone = filterMapping[filters.crimeType];
+    return targetRiskZone ? spot.risk_zone === targetRiskZone : true;
+  });
+
   const handleLocationClick = (city: string) => {
     router.push(`/analytics/location?location=${encodeURIComponent(city)}`);
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
   };
 
   // Only render map on client side
@@ -390,6 +416,119 @@ export function CrimeMap() {
     );
   }
 
+  // Fullscreen view
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background">
+        {/* Fullscreen Header */}
+        <div className="absolute top-0 left-0 right-0 z-[1001] bg-background/95 backdrop-blur border-b border-border p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">
+                Live Crime Zone Map (Mumbai)
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredHotspots.length} of {crimeHotspots.length} locations
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFullscreen}
+              className="h-10 w-10"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Active Filter Banner in Fullscreen */}
+          {filters && filters.crimeType !== "all" && (
+            <div className="mt-3 p-2 rounded-lg bg-primary/10 border border-primary/30 text-sm">
+              <span className="font-medium">Active Filter:</span> Showing{" "}
+              <span className="capitalize font-semibold">{filters.crimeType}</span> zones
+            </div>
+          )}
+        </div>
+
+        {/* Fullscreen Map */}
+        <div className="h-full w-full pt-24">
+          {loading ? (
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <p className="text-muted-foreground">Loading map data...</p>
+            </div>
+          ) : (
+            <MapContainer
+              center={[19.076, 72.8777]}
+              zoom={11}
+              style={{ height: "100%", width: "100%" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+
+              {filteredHotspots.map((spot, index) => (
+                <Circle
+                  key={`${spot.City}-${index}`}
+                  center={[spot.latitude, spot.longitude]}
+                  radius={zoneConfig[spot.risk_zone]?.radius || 1000}
+                  pathOptions={{
+                    color: zoneConfig[spot.risk_zone]?.color || "blue",
+                    fillOpacity: 0.35,
+                  }}
+                >
+                  <Popup>
+                    <div className="space-y-2 p-2">
+                      <h3 className="font-semibold capitalize">{spot.City}</h3>
+                      <p className="text-sm">
+                        Police Needed: {spot.police_needed}
+                      </p>
+
+                      <Badge
+                        variant="outline"
+                        className={
+                          spot.risk_zone === "High"
+                            ? "border-red-500 text-red-500"
+                            : spot.risk_zone === "Medium"
+                              ? "border-orange-500 text-orange-500"
+                              : "border-green-500 text-green-500"
+                        }
+                      >
+                        {spot.risk_zone.toUpperCase()} RISK
+                      </Badge>
+
+                      <Button
+                        size="sm"
+                        onClick={() => handleLocationClick(spot.City)}
+                        className="w-full mt-2 gap-2"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        View Analysis
+                      </Button>
+                    </div>
+                  </Popup>
+                </Circle>
+              ))}
+            </MapContainer>
+          )}
+        </div>
+
+        {/* Fullscreen Legend */}
+        <div className="absolute bottom-6 right-6 z-[1001] rounded-lg bg-background/95 backdrop-blur p-4 shadow-lg border border-border">
+          <p className="mb-3 text-sm font-semibold text-foreground">
+            Crime Severity
+          </p>
+          <div className="space-y-2">
+            <Legend color="red" label="High Risk" />
+            <Legend color="orange" label="Medium Risk" />
+            <Legend color="green" label="Low Risk" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Normal view
   return (
     <Card className="col-span-2 bg-card border-border">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -398,19 +537,12 @@ export function CrimeMap() {
         </CardTitle>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <Layers className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleFullscreen}
+            className="h-8 w-8"
+          >
             <Maximize2 className="h-4 w-4" />
           </Button>
         </div>
@@ -422,6 +554,15 @@ export function CrimeMap() {
             ⚠️ {error}
           </div>
         )}
+
+        {/* Filter Info */}
+        {filters && filters.crimeType !== "all" && (
+          <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/30 text-sm">
+            <span className="font-medium">Active Filter:</span> Showing{" "}
+            <span className="capitalize font-semibold">{filters.crimeType}</span> zones ({filteredHotspots.length} locations)
+          </div>
+        )}
+
         {/* Map Container */}
         <div
           className="h-[500px] rounded-lg overflow-hidden border border-border"
@@ -442,51 +583,48 @@ export function CrimeMap() {
                 attribution="&copy; OpenStreetMap contributors"
               />
 
-              {crimeHotspots &&
-                crimeHotspots.map((spot, index) => (
-                  <Circle
-                    key={`${spot.City}-${index}`}
-                    center={[spot.latitude, spot.longitude]}
-                    radius={zoneConfig[spot.risk_zone]?.radius || 1000}
-                    pathOptions={{
-                      color: zoneConfig[spot.risk_zone]?.color || "blue",
-                      fillOpacity: 0.35,
-                    }}
-                  >
-                    <Popup>
-                      <div className="space-y-2 p-2">
-                        <h3 className="font-semibold capitalize">
-                          {spot.City}
-                        </h3>
-                        <p className="text-sm">
-                          Police Needed: {spot.police_needed}
-                        </p>
+              {filteredHotspots.map((spot, index) => (
+                <Circle
+                  key={`${spot.City}-${index}`}
+                  center={[spot.latitude, spot.longitude]}
+                  radius={zoneConfig[spot.risk_zone]?.radius || 1000}
+                  pathOptions={{
+                    color: zoneConfig[spot.risk_zone]?.color || "blue",
+                    fillOpacity: 0.35,
+                  }}
+                >
+                  <Popup>
+                    <div className="space-y-2 p-2">
+                      <h3 className="font-semibold capitalize">{spot.City}</h3>
+                      <p className="text-sm">
+                        Police Needed: {spot.police_needed}
+                      </p>
 
-                        <Badge
-                          variant="outline"
-                          className={
-                            spot.risk_zone === "High"
-                              ? "border-red-500 text-red-500"
-                              : spot.risk_zone === "Medium"
-                                ? "border-orange-500 text-orange-500"
-                                : "border-green-500 text-green-500"
-                          }
-                        >
-                          {spot.risk_zone.toUpperCase()} RISK
-                        </Badge>
+                      <Badge
+                        variant="outline"
+                        className={
+                          spot.risk_zone === "High"
+                            ? "border-red-500 text-red-500"
+                            : spot.risk_zone === "Medium"
+                              ? "border-orange-500 text-orange-500"
+                              : "border-green-500 text-green-500"
+                        }
+                      >
+                        {spot.risk_zone.toUpperCase()} RISK
+                      </Badge>
 
-                        <Button
-                          size="sm"
-                          onClick={() => handleLocationClick(spot.City)}
-                          className="w-full mt-2 gap-2"
-                        >
-                          <BarChart3 className="h-4 w-4" />
-                          View Analysis
-                        </Button>
-                      </div>
-                    </Popup>
-                  </Circle>
-                ))}
+                      <Button
+                        size="sm"
+                        onClick={() => handleLocationClick(spot.City)}
+                        className="w-full mt-2 gap-2"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        View Analysis
+                      </Button>
+                    </div>
+                  </Popup>
+                </Circle>
+              ))}
             </MapContainer>
           )}
         </div>
@@ -498,7 +636,9 @@ export function CrimeMap() {
             <Legend color="orange" label="Medium Risk" />
             <Legend color="green" label="Low Risk" />
           </div>
-          <span className="text-xs text-muted-foreground">Live data</span>
+          <span className="text-xs text-muted-foreground">
+            Showing {filteredHotspots.length} of {crimeHotspots.length} locations
+          </span>
         </div>
       </CardContent>
     </Card>
