@@ -1,10 +1,50 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { AppShell } from "@/components/layout/app-shell"
-import { StatsCards } from "@/components/dashboard/stats-cards"
 import { CrimeMap } from "@/components/dashboard/crime-map"
-import { RecentActivity } from "@/components/dashboard/recent-activity"
 import { QuickFilters } from "@/components/dashboard/quick-filters"
 
 export default function DashboardPage() {
+  const [filters, setFilters] = useState({
+    crimeType: "all",
+  })
+  const [mounted, setMounted] = useState(false)
+
+  // Load filters from localStorage on mount
+  useEffect(() => {
+    const savedFilters = localStorage.getItem("dashboardFilters")
+    if (savedFilters) {
+      try {
+        setFilters(JSON.parse(savedFilters))
+      } catch (error) {
+        console.error("Error loading filters:", error)
+      }
+    }
+    setMounted(true)
+  }, [])
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("dashboardFilters", JSON.stringify(filters))
+    }
+  }, [filters, mounted])
+
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters)
+  }
+
+  const handleResetFilters = () => {
+    setFilters({
+      crimeType: "all",
+    })
+  }
+
+  if (!mounted) {
+    return null
+  }
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -14,20 +54,16 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">Real-time crime monitoring and analytics</p>
         </div>
 
-        {/* Stats */}
-        <StatsCards />
-
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Map + Activity */}
           <div className="lg:col-span-2 space-y-6">
-            <CrimeMap />
+            <CrimeMap filters={filters} />
           </div>
 
           {/* Sidebar Widgets */}
           <div className="space-y-6">
-            <QuickFilters />
-            <RecentActivity />
+            <QuickFilters onApplyFilters={handleApplyFilters} onResetFilters={handleResetFilters} />
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
+  Users,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -29,6 +30,11 @@ const navItems = [
     title: "Crime Analytics",
     href: "/analytics",
     icon: BarChart3,
+  },
+  {
+    title: "Police Allocation",
+    href: "/police-allocation",
+    icon: Users,
   },
   {
     title: "Settings",

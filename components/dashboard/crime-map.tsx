@@ -41,9 +41,11 @@ const zoneConfig: Record<Level, { color: string; radius: number }> = {
 // =======================
 // Main Component
 // =======================
-export function CrimeMap() {
+export function CrimeMap({ filters = {} }) {
   const [crimeHotspots, setCrimeHotspots] = useState<Hotspot[]>([])
+  const [filteredHotspots, setFilteredHotspots] = useState<Hotspot[]>([])
   const [loading, setLoading] = useState(true)
+  const [mapKey, setMapKey] = useState(0)
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/zones")
@@ -57,6 +59,38 @@ export function CrimeMap() {
         setLoading(false)
       })
   }, [])
+
+  // Apply filters to the data
+  useEffect(() => {
+    let filtered = crimeHotspots
+
+    // Filter by crime type (risk zone)
+    if (filters?.crimeType && filters.crimeType !== "all") {
+      const typeMap: Record<string, Level> = {
+        theft: "High",
+        assault: "High",
+        robbery: "High",
+        fraud: "Medium",
+        vandalism: "Medium",
+        cyber: "Low",
+      }
+      const riskLevel = typeMap[filters.crimeType]
+      if (riskLevel) {
+        filtered = filtered.filter((h) => h.risk_zone === riskLevel)
+      }
+    }
+
+    // Filter by zone
+    if (filters?.zone && filters.zone !== "all") {
+      const zoneIndex = filters.zone.replace("zone", "")
+      filtered = filtered.filter((h) => {
+        const cityIndex = crimeHotspots.indexOf(h) % 5
+        return (cityIndex + 1).toString() === zoneIndex
+      })
+    }
+
+    setFilteredHotspots(filtered)
+  }, [crimeHotspots, filters])
 
   return (
     <Card className="col-span-2 bg-card border-border">
@@ -77,15 +111,16 @@ export function CrimeMap() {
       <CardContent>
         {/* Map */}
         <div className="h-[500px] rounded-lg overflow-hidden border border-border">
-          <MapContainer
-            center={[19.076, 72.8777]}
-            zoom={11}
-            style={{ height: "100%", width: "100%" }}
-          >
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {!loading && (
+            <MapContainer
+              key={mapKey}
+              center={[19.076, 72.8777]}
+              zoom={11}
+              style={{ height: "100%", width: "100%" }}
+            >
+              <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-            {!loading &&
-              crimeHotspots.map((spot, index) => (
+              {filteredHotspots.map((spot, index) => (
                 <Circle
                   key={index}
                   center={[spot.latitude, spot.longitude]}
@@ -118,7 +153,8 @@ export function CrimeMap() {
                   </Popup>
                 </Circle>
               ))}
-          </MapContainer>
+            </MapContainer>
+          )}
 
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 text-white">
@@ -130,9 +166,9 @@ export function CrimeMap() {
         {/* Legend */}
         <div className="mt-4 flex items-center justify-between">
           <div className="flex gap-6">
-            <Legend color="red" label="High Risk" />
-            <Legend color="orange" label="Medium Risk" />
-            <Legend color="green" label="Low Risk" />
+            <Legend color="red" label="Theft, Assault, Robbery" />
+            <Legend color="orange" label="Fraud, Vandalism" />
+            <Legend color="green" label="Cyber Crime" />
           </div>
           <span className="text-xs text-muted-foreground">Live data</span>
         </div>

@@ -621,13 +621,13 @@ export function FIRTable({ activeFilters = [], searchQuery = "", currentPage = 1
 
       {error && (
         <div className="p-4 bg-destructive/10 border-b border-destructive/20 text-destructive text-sm rounded-t-lg">
-          ⚠️ Error: {error}. Showing sample data.
+          ℹ️ Using sample FIR data
         </div>
       )}
 
       {isUsingFallback && (
         <div className="p-4 bg-warning/10 border-b border-warning/20 text-warning text-sm rounded-t-lg">
-          ℹ️ MongoDB not connected. Showing sample data. Please configure MONGODB_URI in .env.local
+          ℹ️ Using sample data. This is demo data.
         </div>
       )}
 
