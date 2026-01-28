@@ -5,8 +5,6 @@ import { useSearchParams } from "next/navigation"
 import { AppShell } from "@/components/layout/app-shell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-
-export const dynamic = 'force-dynamic'
 import {
     LineChart,
     Line,
@@ -36,6 +34,7 @@ export default function LocationAnalyticsPage() {
     const [hourlyData, setHourlyData] = useState([])
     const [stats, setStats] = useState({})
     const [timeframe, setTimeframe] = useState("monthly")
+    const [selectedCrimeType, setSelectedCrimeType] = useState(null)
 
     // Simulated data for the location
     const generateLocationData = useCallback(() => {
@@ -132,6 +131,104 @@ export default function LocationAnalyticsPage() {
             )
         }
         return null
+    }
+
+    const getCrimeSuggestions = (crime) => {
+        if (!crime) return null
+
+        const total = crime.value
+        const resolved = crime.caseClosed
+        const pending = total - resolved
+        const resolutionRate = ((resolved / total) * 100).toFixed(1)
+
+        const suggestions = {
+            Theft: {
+                strategies: [
+                    "Increase CCTV surveillance in high-traffic areas",
+                    "Deploy plainclothes officers during peak shopping hours",
+                    "Collaborate with retail establishments for better security",
+                    "Focus on serial theft locations"
+                ],
+                priority: resolutionRate < 50 ? "high" : "medium",
+                resource: pending > resolved ? 8 : 5,
+                action: "Implement vehicle patrol on main streets"
+            },
+            Assault: {
+                strategies: [
+                    "Increase presence in known hotspots",
+                    "Conduct community awareness programs",
+                    "Deploy officers in high-conflict areas",
+                    "Establish rapid response teams"
+                ],
+                priority: resolutionRate < 55 ? "high" : "medium",
+                resource: pending > resolved ? 6 : 4,
+                action: "Set up mobile patrol units in conflict zones"
+            },
+            Fraud: {
+                strategies: [
+                    "Strengthen cyber crime unit resources",
+                    "Partner with financial institutions",
+                    "Educate public about common fraud tactics",
+                    "Focus on online transaction monitoring"
+                ],
+                priority: resolutionRate < 60 ? "high" : "low",
+                resource: pending > resolved ? 5 : 3,
+                action: "Establish fraud investigation task force"
+            },
+            Burglary: {
+                strategies: [
+                    "Increase residential area patrols",
+                    "Community neighborhood watch programs",
+                    "Target known burglary hotspots",
+                    "Focus on commercial areas during off-hours"
+                ],
+                priority: resolutionRate < 50 ? "high" : "medium",
+                resource: pending > resolved ? 6 : 4,
+                action: "Implement neighborhood security checkpoints"
+            },
+            Robbery: {
+                strategies: [
+                    "Increase nighttime patrols",
+                    "Deploy tactical response teams",
+                    "Focus on high-value robbery locations",
+                    "Enhance ATM and bank security coordination"
+                ],
+                priority: resolutionRate < 45 ? "critical" : "high",
+                resource: pending > resolved ? 10 : 7,
+                action: "Deploy armed rapid response teams during peak hours"
+            },
+            Vandalism: {
+                strategies: [
+                    "Increase community engagement",
+                    "Deploy youth intervention programs",
+                    "Increase street lighting and CCTV",
+                    "Focus on repeat offender tracking"
+                ],
+                priority: resolutionRate < 65 ? "medium" : "low",
+                resource: pending > resolved ? 3 : 2,
+                action: "Engage community for preventive measures"
+            },
+            Other: {
+                strategies: [
+                    "Conduct detailed case analysis",
+                    "Increase general patrol presence",
+                    "Focus on community policing",
+                    "Establish tip lines for public information"
+                ],
+                priority: resolutionRate < 50 ? "medium" : "low",
+                resource: pending > resolved ? 4 : 2,
+                action: "Launch community awareness campaign"
+            }
+        }
+
+        return {
+            crime: crime.name,
+            total,
+            resolved,
+            pending,
+            resolutionRate,
+            ...(suggestions[crime.name] || suggestions.Other)
+        }
     }
 
     return (
@@ -322,6 +419,7 @@ export default function LocationAnalyticsPage() {
                                                 <p className="text-sm text-muted-foreground">
                                                     Detected 23% increase in theft crimes during evening hours. Deploy additional mobile units.
                                                 </p>
+
                                             </div>
                                         </div>
                                         <div className="flex items-start gap-3">
@@ -334,11 +432,45 @@ export default function LocationAnalyticsPage() {
                                                     Current police deployment shows {Math.round((5 / 12) * 100)}% efficiency. Increase deployment by 15% during peak hours for optimal coverage.
                                                 </p>
                                             </div>
+
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </CardContent>
+                        {/* Location-Specific Insights */}
+                        <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+                            <CardHeader>
+                                <CardTitle>24-Hour Deployment Recommendations</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+
+
+                                {/* Hourly Breakdown Table */}
+                                <div className="mt-6 pt-4 border-t border-blue-500/20">
+
+                                    <div className="grid gap-2 text-sm">
+                                        <div className="flex justify-between items-center p-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                                            <span className="text-foreground font-semibold">18:00-22:00 IST (Peak)</span>
+                                            <span className="text-red-600 font-bold">Deploy 8-10 Officers</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                            <span className="text-foreground font-semibold">12:00-18:00 IST (Moderate)</span>
+                                            <span className="text-yellow-600 font-bold">Deploy 5-6 Officers</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                                            <span className="text-foreground font-semibold">22:00-04:00 IST (Low)</span>
+                                            <span className="text-blue-600 font-bold">Deploy 3-4 Officers</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-2 bg-green-500/10 rounded-lg border border-green-500/20">
+                                            <span className="text-foreground font-semibold">04:00-12:00 IST (Minimum)</span>
+                                            <span className="text-green-600 font-bold">Deploy 2-3 Officers</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </Card>
 
                     {/* Crime Type Distribution */}
@@ -387,7 +519,7 @@ export default function LocationAnalyticsPage() {
                     {/* Resolution Rate Comparison */}
                     <Card className="bg-card border-border">
                         <CardHeader>
-                            <CardTitle>Case Resolution by Crime Type</CardTitle>
+                            <CardTitle>Case Resolution by Crime Type - Click to View Suggestions</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
@@ -399,85 +531,143 @@ export default function LocationAnalyticsPage() {
                                     }))}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                    <XAxis dataKey="name" stroke="#9CA3AF" />
+                                    <XAxis
+                                        dataKey="name"
+                                        stroke="#9CA3AF"
+                                        style={{ cursor: "pointer" }}
+                                    />
                                     <YAxis stroke="#9CA3AF" />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Legend />
-                                    <Bar dataKey="resolved" fill="#4ECDC4" name="Resolved" />
-                                    <Bar dataKey="pending" fill="#FFB6C1" name="Pending" />
+                                    <Bar
+                                        dataKey="resolved"
+                                        fill="#4ECDC4"
+                                        name="Resolved"
+                                        onClick={(data) => {
+                                            const crime = crimeTypeData.find(ct => ct.name === data.name)
+                                            setSelectedCrimeType(crime)
+                                        }}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                    <Bar
+                                        dataKey="pending"
+                                        fill="#FFB6C1"
+                                        name="Pending"
+                                        onClick={(data) => {
+                                            const crime = crimeTypeData.find(ct => ct.name === data.name)
+                                            setSelectedCrimeType(crime)
+                                        }}
+                                        style={{ cursor: "pointer" }}
+                                    />
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
                     </Card>
+
+                    {/* Crime-Type Suggestions Card */}
+                    {selectedCrimeType && (() => {
+                        const suggestionData = getCrimeSuggestions(selectedCrimeType)
+                        const priorityColors = {
+                            critical: "from-red-500/5 to-red-500/5 border-red-500",
+                            high: "from-orange-500/5 to-orange-500/5 border-orange-500",
+                            medium: "from-yellow-500/5 to-yellow-500/5 border-yellow-500",
+                            low: "from-green-500/5 to-green-500/5 border-green-500"
+                        }
+                        return (
+                            <Card className={`bg-gradient-to-br border-l-4 lg:col-span-2 ${priorityColors[suggestionData.priority]}`}>
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <CardTitle className="text-xl">{selectedCrimeType.name} - Crime Analysis & Recommendations</CardTitle>
+                                            <p className="text-sm text-muted-foreground mt-1">Click on the chart bars to view different crime types</p>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setSelectedCrimeType(null)}
+                                        >
+                                            ✕
+                                        </Button>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Stats */}
+                                    <div className="grid gap-4 md:grid-cols-4">
+                                        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                            <p className="text-xs text-muted-foreground uppercase">Total Cases</p>
+                                            <p className="text-2xl font-bold text-foreground mt-1">{suggestionData.total}</p>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                                            <p className="text-xs text-muted-foreground uppercase">Resolved</p>
+                                            <p className="text-2xl font-bold text-green-500 mt-1">{suggestionData.resolved}</p>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                                            <p className="text-xs text-muted-foreground uppercase">Pending</p>
+                                            <p className="text-2xl font-bold text-red-500 mt-1">{suggestionData.pending}</p>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                                            <p className="text-xs text-muted-foreground uppercase">Resolution Rate</p>
+                                            <p className="text-2xl font-bold text-purple-500 mt-1">{suggestionData.resolutionRate}%</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Priority & Resource Allocation */}
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className={`p-4 rounded-lg border ${suggestionData.priority === "critical"
+                                                ? "bg-red-500/10 border-red-500/20"
+                                                : suggestionData.priority === "high"
+                                                    ? "bg-orange-500/10 border-orange-500/20"
+                                                    : suggestionData.priority === "medium"
+                                                        ? "bg-yellow-500/10 border-yellow-500/20"
+                                                        : "bg-green-500/10 border-green-500/20"
+                                            }`}>
+                                            <p className="text-xs font-semibold uppercase text-muted-foreground">Priority Level</p>
+                                            <p className={`text-lg font-bold mt-2 uppercase ${suggestionData.priority === "critical"
+                                                    ? "text-red-500"
+                                                    : suggestionData.priority === "high"
+                                                        ? "text-orange-500"
+                                                        : suggestionData.priority === "medium"
+                                                            ? "text-yellow-500"
+                                                            : "text-green-500"
+                                                }`}>{suggestionData.priority}</p>
+                                        </div>
+                                        <div className="p-4 rounded-lg border bg-blue-500/10 border-blue-500/20">
+                                            <p className="text-xs font-semibold uppercase text-muted-foreground">Recommended Police Deployment</p>
+                                            <p className="text-lg font-bold mt-2 text-blue-500">{suggestionData.resource} Officers</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Item */}
+                                    <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
+                                        <p className="text-xs font-semibold uppercase text-muted-foreground mb-2">Recommended Action</p>
+                                        <p className="text-foreground font-semibold">{suggestionData.action}</p>
+                                    </div>
+
+                                    {/* Strategies */}
+                                    <div>
+                                        <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                                            <span className="text-lg">🎯</span> Strategic Recommendations
+                                        </h4>
+                                        <div className="grid gap-2">
+                                            {suggestionData.strategies.map((strategy, idx) => (
+                                                <div key={idx} className="flex gap-3 p-3 rounded-lg bg-muted/50 border border-border/50 hover:border-border transition-colors">
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/20 text-blue-600 flex-shrink-0 text-xs font-bold">
+                                                        {idx + 1}
+                                                    </div>
+                                                    <p className="text-sm text-foreground">{strategy}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )
+                    })()}
                 </div>
 
 
 
-                {/* Location-Specific Insights */}
-                <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/20">
-                    <CardHeader>
-                        <CardTitle>24-Hour Crime Pattern Insights & Recommendations</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="rounded-lg bg-card p-4 border border-border">
-                                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                                    <span className="text-red-500">🔴</span> Critical Peak Hours
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Highest crime incidents occur between 18:00-22:00 IST (Evening Peak). Currently experiencing 23% increase in theft crimes during this window.
-                                </p>
-                            </div>
-                            <div className="rounded-lg bg-card p-4 border border-border">
-                                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                                    <span className="text-yellow-500">🟡</span> Police Deployment Gap
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Current police deployment shows 58% efficiency during peak hours. Recommend increasing deployment by 15% (from 6 to 7 officers) during 18:00-23:00.
-                                </p>
-                            </div>
-                            <div className="rounded-lg bg-card p-4 border border-border">
-                                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                                    <span className="text-blue-500">🔵</span> Low Crime Hours
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Crimes at minimum between 04:00-07:00 IST (Early Morning). Can reduce deployment to 2 officers during this period for cost optimization.
-                                </p>
-                            </div>
-                            <div className="rounded-lg bg-card p-4 border border-border">
-                                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                                    <span className="text-green-500">🟢</span> Actionable Alert
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Mobile theft incidents trending upward (+23%). Deploy specialized theft prevention units with plainclothes officers in commercial zones during peak hours.
-                                </p>
-                            </div>
-                        </div>
 
-                        {/* Hourly Breakdown Table */}
-                        <div className="mt-6 pt-4 border-t border-blue-500/20">
-                            <h4 className="font-semibold text-foreground mb-3">24-Hour Deployment Recommendations</h4>
-                            <div className="grid gap-2 text-sm">
-                                <div className="flex justify-between items-center p-2 bg-red-500/10 rounded-lg border border-red-500/20">
-                                    <span className="text-foreground font-semibold">18:00-22:00 IST (Peak)</span>
-                                    <span className="text-red-600 font-bold">Deploy 8-10 Officers</span>
-                                </div>
-                                <div className="flex justify-between items-center p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                                    <span className="text-foreground font-semibold">12:00-18:00 IST (Moderate)</span>
-                                    <span className="text-yellow-600 font-bold">Deploy 5-6 Officers</span>
-                                </div>
-                                <div className="flex justify-between items-center p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                                    <span className="text-foreground font-semibold">22:00-04:00 IST (Low)</span>
-                                    <span className="text-blue-600 font-bold">Deploy 3-4 Officers</span>
-                                </div>
-                                <div className="flex justify-between items-center p-2 bg-green-500/10 rounded-lg border border-green-500/20">
-                                    <span className="text-foreground font-semibold">04:00-12:00 IST (Minimum)</span>
-                                    <span className="text-green-600 font-bold">Deploy 2-3 Officers</span>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
         </AppShell>
     )
