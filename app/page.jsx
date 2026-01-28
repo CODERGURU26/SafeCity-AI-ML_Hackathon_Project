@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { AppShell } from "@/components/layout/app-shell"
 import { CrimeMap } from "@/components/dashboard/crime-map"
 import { QuickFilters } from "@/components/dashboard/quick-filters"
+import TopCases, { ActiveOfficers } from "@/components/dashboard/top-cases"
 // import 'leaflet/dist/leaflet.css';
 
 export default function DashboardPage() {
@@ -60,6 +61,8 @@ export default function DashboardPage() {
           {/* Map + Activity */}
           <div className="lg:col-span-2 space-y-6">
             <CrimeMap filters={filters} />
+            <TopCases />
+            <ActiveOfficers />
           </div>
 
           {/* Sidebar Widgets */}

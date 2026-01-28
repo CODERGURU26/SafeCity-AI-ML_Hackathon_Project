@@ -120,13 +120,6 @@ const FALLBACK_HOTSPOTS: Hotspot[] = [
 // =======================
 // Main Component
 // =======================
-<<<<<<< HEAD
-export function CrimeMap({ filters = {} }) {
-  const [crimeHotspots, setCrimeHotspots] = useState<Hotspot[]>([])
-  const [filteredHotspots, setFilteredHotspots] = useState<Hotspot[]>([])
-  const [loading, setLoading] = useState(true)
-  const [mapKey, setMapKey] = useState(0)
-=======
 export function CrimeMap() {
   const [crimeHotspots, setCrimeHotspots] = useState<Hotspot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,7 +127,6 @@ export function CrimeMap() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const mapRef = useRef(null);
->>>>>>> ed82cb29bc5404847d1e3238c33637d06a4693e2
 
   useEffect(() => {
     setIsClient(true);
@@ -170,38 +162,6 @@ export function CrimeMap() {
     );
   }
 
-  // Apply filters to the data
-  useEffect(() => {
-    let filtered = crimeHotspots
-
-    // Filter by crime type (risk zone)
-    if (filters?.crimeType && filters.crimeType !== "all") {
-      const typeMap: Record<string, Level> = {
-        theft: "High",
-        assault: "High",
-        robbery: "High",
-        fraud: "Medium",
-        vandalism: "Medium",
-        cyber: "Low",
-      }
-      const riskLevel = typeMap[filters.crimeType]
-      if (riskLevel) {
-        filtered = filtered.filter((h) => h.risk_zone === riskLevel)
-      }
-    }
-
-    // Filter by zone
-    if (filters?.zone && filters.zone !== "all") {
-      const zoneIndex = filters.zone.replace("zone", "")
-      filtered = filtered.filter((h) => {
-        const cityIndex = crimeHotspots.indexOf(h) % 5
-        return (cityIndex + 1).toString() === zoneIndex
-      })
-    }
-
-    setFilteredHotspots(filtered)
-  }, [crimeHotspots, filters])
-
   return (
     <Card className="col-span-2 bg-card border-border">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -229,58 +189,6 @@ export function CrimeMap() {
       </CardHeader>
 
       <CardContent>
-<<<<<<< HEAD
-        {/* Map */}
-        <div className="h-[500px] rounded-lg overflow-hidden border border-border">
-          {!loading && (
-            <MapContainer
-              key={mapKey}
-              center={[19.076, 72.8777]}
-              zoom={11}
-              style={{ height: "100%", width: "100%" }}
-            >
-              <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-              {filteredHotspots.map((spot, index) => (
-                <Circle
-                  key={index}
-                  center={[spot.latitude, spot.longitude]}
-                  radius={zoneConfig[spot.risk_zone].radius}
-                  pathOptions={{
-                    color: zoneConfig[spot.risk_zone].color,
-                    fillOpacity: 0.35,
-                  }}
-                >
-                  <Popup>
-                    <div className="space-y-1">
-                      <h3 className="font-semibold capitalize">{spot.City}</h3>
-                      <p className="text-sm">
-                        Police Needed: {spot.police_needed}
-                      </p>
-
-                      <Badge
-                        variant="outline"
-                        className={
-                          spot.risk_zone === "High"
-                            ? "border-red-500 text-red-500"
-                            : spot.risk_zone === "Medium"
-                            ? "border-orange-500 text-orange-500"
-                            : "border-green-500 text-green-500"
-                        }
-                      >
-                        {spot.risk_zone.toUpperCase()} RISK
-                      </Badge>
-                    </div>
-                  </Popup>
-                </Circle>
-              ))}
-            </MapContainer>
-          )}
-
-          {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 text-white">
-              Loading map data...
-=======
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-700 text-sm">
             ⚠️ {error}
@@ -294,7 +202,6 @@ export function CrimeMap() {
           {loading ? (
             <div className="w-full h-full flex items-center justify-center bg-muted">
               <p className="text-muted-foreground">Loading map data...</p>
->>>>>>> ed82cb29bc5404847d1e3238c33637d06a4693e2
             </div>
           ) : (
             <MapContainer
@@ -359,9 +266,9 @@ export function CrimeMap() {
         {/* Legend */}
         <div className="mt-4 flex items-center justify-between">
           <div className="flex gap-6">
-            <Legend color="red" label="Theft, Assault, Robbery" />
-            <Legend color="orange" label="Fraud, Vandalism" />
-            <Legend color="green" label="Cyber Crime" />
+            <Legend color="red" label="High Risk" />
+            <Legend color="orange" label="Medium Risk" />
+            <Legend color="green" label="Low Risk" />
           </div>
           <span className="text-xs text-muted-foreground">Live data</span>
         </div>
