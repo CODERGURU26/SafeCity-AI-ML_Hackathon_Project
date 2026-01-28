@@ -17,7 +17,7 @@ import { useState } from "react"
 
 const navItems = [
   {
-    title: "Map",
+    title: "Monitoring",
     href: "/",
     icon: LayoutDashboard,
   },
