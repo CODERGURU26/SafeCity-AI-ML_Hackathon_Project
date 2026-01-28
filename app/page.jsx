@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { AppShell } from "@/components/layout/app-shell"
 import { CrimeMap } from "@/components/dashboard/crime-map"
 import { QuickFilters } from "@/components/dashboard/quick-filters"
+// import 'leaflet/dist/leaflet.css';
 
 export default function DashboardPage() {
   const [filters, setFilters] = useState({
