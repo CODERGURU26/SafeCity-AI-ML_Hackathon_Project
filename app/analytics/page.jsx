@@ -165,13 +165,12 @@ export default function AnalyticsPage() {
                     <stat.icon className="h-5 w-5" />
                   </div>
                   <span
-                    className={`text-sm ${
-                      stat.trend === "up" && stat.color !== "warning"
+                    className={`text-sm ${stat.trend === "up" && stat.color !== "warning"
                         ? "text-success"
                         : stat.trend === "down" && stat.color === "warning"
                           ? "text-success"
                           : "text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {stat.change}
                   </span>

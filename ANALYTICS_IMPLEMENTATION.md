@@ -1,11 +1,13 @@
 # Crime Analytics Dashboard - Complete Implementation Guide
 
 ## Overview
+
 The Crime Analytics Dashboard provides comprehensive crime data analysis with data-driven visualizations, predictive insights, and location-specific analytics.
 
 ## Features Implemented
 
 ### 1. **Time-Based Crime Charts with Police Allocation**
+
 - **Location**: `/analytics` page
 - **Component**: `CrimeAnalyticsFiltered`
 - **Features**:
@@ -16,6 +18,7 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
   - Interactive tooltips with detailed information
 
 ### 2. **Crime Distribution Pie Chart**
+
 - Shows breakdown of crime types:
   - Theft
   - Assault
@@ -27,17 +30,20 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
 - Color-coded segments with percentages
 
 ### 3. **Crime Type Comparison Bar Graph**
+
 - Horizontal bar chart comparing:
   - Total incidents by crime type
   - Easy visual comparison across categories
   - Customizable time range filtering
 
 ### 4. **Hourly Crime Pattern Chart**
+
 - Shows when crimes are most likely to occur
 - 24-hour breakdown
 - Helps identify peak crime hours for police deployment
 
 ### 5. **Time Duration Filter**
+
 - **Options Available**:
   - **Daily**: View hour-by-hour or day-by-day patterns
   - **Monthly**: Analyze monthly trends and seasonal patterns
@@ -45,6 +51,7 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
 - Real-time chart updates based on selected timeframe
 
 ### 6. **Predictive Insights**
+
 - AI-powered predictions with confidence levels:
   - **High Risk Alert**: Predicted crime surge in specific areas
   - **Positive Trend**: Decreasing crime rates with confidence %
@@ -55,6 +62,7 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
 - Actionable recommendations for law enforcement
 
 ### 7. **Location-Specific Analytics**
+
 - **Access**: Click "View Analysis" on any location in the crime map
 - **URL**: `/analytics/location?location=CityName`
 - **Features**:
@@ -69,6 +77,7 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
 ### Frontend Components
 
 #### 1. `CrimeAnalyticsFiltered` (`components/analytics/crime-analytics-filtered.jsx`)
+
 ```jsx
 - Time-based trend chart with police allocation
 - Crime type pie chart
@@ -78,6 +87,7 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
 ```
 
 #### 2. `PredictiveInsightsAnalytics` (`components/analytics/predictive-insights-analytics.jsx`)
+
 ```jsx
 - 5 different insight cards
 - Confidence percentage display
@@ -86,6 +96,7 @@ The Crime Analytics Dashboard provides comprehensive crime data analysis with da
 ```
 
 #### 3. `LocationAnalyticsPage` (`app/analytics/location/page.jsx`)
+
 ```jsx
 - Location-specific statistics cards
 - Timeline chart with cases closed
@@ -173,16 +184,19 @@ Insights:
 ## Interactive Features
 
 ### Map Integration
+
 - Click on any location marker on the crime map
 - Button: "View Analysis" opens location-specific page
 - Smooth navigation with location name in URL
 
 ### Time Filter Controls
+
 - Three buttons: Daily | Monthly | Yearly
 - All charts update in real-time
 - Responsive to user selection
 
 ### Tooltip Information
+
 - Hover over chart elements to see details
 - Shows exact numbers for each data point
 - Custom formatted for readability
@@ -198,6 +212,7 @@ Insights:
 ## API Integration
 
 ### Frontend to Backend
+
 ```
 Browser (Frontend)
     ↓ HTTP Requests
@@ -211,6 +226,7 @@ Recharts Visualization
 ```
 
 ### Running the Backend
+
 ```bash
 cd python_ml_backend
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
@@ -219,6 +235,7 @@ python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ## Usage Examples
 
 ### Viewing Overall Analytics
+
 ```
 Navigate to: http://localhost:3000/analytics
 - View crime trends with time filters
@@ -227,6 +244,7 @@ Navigate to: http://localhost:3000/analytics
 ```
 
 ### Viewing Location-Specific Analytics
+
 ```
 Option 1: Via Map
 - Go to dashboard
@@ -239,6 +257,7 @@ Option 2: Direct URL
 ```
 
 ### Filtering by Time Period
+
 ```
 On Analytics Page:
 - Click "daily" for 24-hour view
@@ -249,11 +268,13 @@ On Analytics Page:
 ## Predictive Insights Details
 
 ### Confidence Levels
+
 - **87% - 94%**: Based on historical data patterns
 - **Machine Learning Model**: Predicts crime trends
 - **Actionable**: All insights have specific recommendations
 
 ### Recommendation Types
+
 1. Resource allocation adjustments
 2. Patrol timing changes
 3. Special unit deployment
@@ -274,16 +295,19 @@ On Analytics Page:
 ## Troubleshooting
 
 ### Charts Not Showing
+
 1. Check if backend is running on http://127.0.0.1:8000
 2. Verify data format matches expected structure
 3. Check browser console for errors
 
 ### Location Analytics Not Loading
+
 1. Ensure location name matches database
 2. Check URL encoding (special characters)
 3. Verify backend has location data
 
 ### Performance Issues
+
 1. Reduce data range if analyzing large timeframes
 2. Close other applications using resources
 3. Clear browser cache
@@ -313,11 +337,13 @@ python_ml_backend/
 ## Dependencies
 
 ### Frontend
+
 - recharts: ^2.10.0
 - react-leaflet: ^5.0.0
 - lucide-react: UI icons
 
 ### Backend
+
 - fastapi: Web framework
 - uvicorn: ASGI server
 - pandas: Data processing
@@ -325,6 +351,7 @@ python_ml_backend/
 ## Support & Documentation
 
 For detailed implementation, refer to:
+
 - Individual component files with inline comments
 - Backend API documentation at `/docs` when running FastAPI
 - Data utility functions in `lib/analytics-utils.js`

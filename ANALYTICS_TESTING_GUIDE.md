@@ -1,23 +1,27 @@
 # Quick Start: Crime Analytics Testing Guide
 
 ## Prerequisites
+
 - Backend running: `python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000`
 - Frontend running: `npm run dev` or `pnpm dev`
 
 ## Step-by-Step Testing
 
 ### 1. Access Analytics Dashboard
+
 ```
 URL: http://localhost:3000/analytics
 ```
 
 **Expected to See:**
+
 - Header: "Crime Analytics Dashboard"
 - 4 stats cards (Total Incidents, Resolution Rate, Avg Response Time, Predictions Accuracy)
 - Time filter buttons (Daily, Monthly, Yearly)
 - Multiple charts loading with sample data
 
 ### 2. Test Time Duration Filter
+
 ```
 Click Filter Buttons:
 - "daily" → Charts update to show daily breakdown
@@ -26,6 +30,7 @@ Click Filter Buttons:
 ```
 
 **Charts That Update:**
+
 1. Crime Trends & Police Allocation (Line Chart)
 2. Crime Distribution by Type (Pie Chart)
 3. Hourly Crime Pattern (Bar Chart)
@@ -34,6 +39,7 @@ Click Filter Buttons:
 ### 3. Test Chart Interactions
 
 #### Hover Tooltips
+
 ```
 Mouse over any data point on charts
 → Tooltip appears showing:
@@ -43,6 +49,7 @@ Mouse over any data point on charts
 ```
 
 #### Chart Responsiveness
+
 ```
 Resize browser window
 → Charts automatically responsive
@@ -50,6 +57,7 @@ Resize browser window
 ```
 
 ### 4. View Predictive Insights
+
 ```
 Scroll down on /analytics page
 → See 5 insight cards:
@@ -61,12 +69,14 @@ Scroll down on /analytics page
 ```
 
 **Each Card Shows:**
+
 - Icon representing the insight type
 - Title and description
 - Confidence percentage badge
 - Color-coded severity level
 
 ### 5. Recommended Actions Section
+
 ```
 Below insights cards:
 → 4 numbered actionable recommendations:
@@ -79,6 +89,7 @@ Below insights cards:
 ### 6. Test Location-Based Analytics
 
 #### Via Map (Dashboard)
+
 ```
 1. Go to: http://localhost:3000
 2. Scroll to map section
@@ -88,11 +99,13 @@ Below insights cards:
 ```
 
 #### Direct URL
+
 ```
 URL: http://localhost:3000/analytics/location?location=Andheri
 ```
 
 **Expected to See:**
+
 - Page title: "Andheri Crime Analysis"
 - 4 stat cards showing location-specific metrics
 - Time period filter (Daily/Monthly/Yearly)
@@ -105,6 +118,7 @@ URL: http://localhost:3000/analytics/location?location=Andheri
 ### 7. Location-Specific Features
 
 #### Stats Cards on Location Page
+
 ```
 Card 1: Total Incidents (e.g., 245)
 Card 2: Resolution Rate (e.g., 65.1%)
@@ -113,6 +127,7 @@ Card 4: Avg Police Deployed (e.g., 8)
 ```
 
 #### Charts on Location Page
+
 ```
 1. Crime Timeline (Line Chart)
    - Shows crimes, police deployed, cases closed over time
@@ -128,6 +143,7 @@ Card 4: Avg Police Deployed (e.g., 8)
 ```
 
 #### Location-Specific Insights
+
 ```
 Scroll to bottom
 → Card: "Location-Specific Insights & Recommendations"
@@ -141,6 +157,7 @@ Scroll to bottom
 ## Test Data
 
 ### Sample Crime Records (in memory)
+
 ```javascript
 {
   "Report Number": "MUM800001",
@@ -154,6 +171,7 @@ Scroll to bottom
 ```
 
 ### Available Locations in Sample Data
+
 - Andheri
 - Dadar
 - Bandra
@@ -164,11 +182,13 @@ Scroll to bottom
 ### Test Backend Endpoints
 
 #### Get All Zones
+
 ```bash
 curl http://127.0.0.1:8000/zones
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -182,11 +202,13 @@ curl http://127.0.0.1:8000/zones
 ```
 
 #### Get City Statistics
+
 ```bash
 curl http://127.0.0.1:8000/city/andheri/statistics
 ```
 
 **Response:**
+
 ```json
 {
   "city": "Andheri",
@@ -199,6 +221,7 @@ curl http://127.0.0.1:8000/city/andheri/statistics
 ```
 
 #### Get Overall Statistics
+
 ```bash
 curl http://127.0.0.1:8000/statistics
 ```
@@ -206,6 +229,7 @@ curl http://127.0.0.1:8000/statistics
 ## Common Issues & Solutions
 
 ### Issue: Charts Not Showing Data
+
 ```
 Solution:
 1. Check browser console for errors (F12)
@@ -215,6 +239,7 @@ Solution:
 ```
 
 ### Issue: Time Filter Not Working
+
 ```
 Solution:
 1. Click filter button again
@@ -224,6 +249,7 @@ Solution:
 ```
 
 ### Issue: Location Analysis Shows No Data
+
 ```
 Solution:
 1. Check if location name is correct
@@ -233,6 +259,7 @@ Solution:
 ```
 
 ### Issue: Backend Connection Error
+
 ```
 Solution:
 1. Start backend: cd python_ml_backend
@@ -244,16 +271,19 @@ Solution:
 ## Performance Testing
 
 ### Load Time
+
 - Analytics page: <2 seconds
 - Charts render: <1 second
 - Location page: <1.5 seconds
 
 ### Responsiveness
+
 - Time filter update: Instant
 - Chart hover: Smooth
 - Window resize: No lag
 
 ### Browser Compatibility
+
 - Chrome: ✅ Fully supported
 - Firefox: ✅ Fully supported
 - Safari: ✅ Fully supported
@@ -262,6 +292,7 @@ Solution:
 ## Feature Verification Checklist
 
 ### Analytics Dashboard
+
 - [ ] Page loads successfully
 - [ ] 4 stat cards visible
 - [ ] All 4 charts render
@@ -271,6 +302,7 @@ Solution:
 - [ ] Responsive on mobile
 
 ### Predictive Insights
+
 - [ ] 5 insight cards visible
 - [ ] Confidence percentages show
 - [ ] Different colors for each type
@@ -278,6 +310,7 @@ Solution:
 - [ ] 4 action items listed
 
 ### Location Analytics
+
 - [ ] Can navigate from map
 - [ ] Page shows location name
 - [ ] 4 location stats visible
@@ -286,6 +319,7 @@ Solution:
 - [ ] Insights section visible
 
 ### Map Integration
+
 - [ ] Map loads with circles
 - [ ] Click on circle shows popup
 - [ ] "View Analysis" button visible
@@ -316,6 +350,7 @@ Solution:
 ## Support
 
 For issues or questions:
+
 1. Check browser console (F12)
 2. Review ANALYTICS_IMPLEMENTATION.md
 3. Check backend logs in terminal
