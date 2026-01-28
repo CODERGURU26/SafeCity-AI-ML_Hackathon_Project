@@ -3,6 +3,7 @@ import { StatsCards } from "@/components/dashboard/stats-cards"
 import { CrimeMap } from "@/components/dashboard/crime-map"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 import { QuickFilters } from "@/components/dashboard/quick-filters"
+// import 'leaflet/dist/leaflet.css';
 
 export default function DashboardPage() {
   return (
