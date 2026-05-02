@@ -1,94 +1,61 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Clock, CheckCircle, AlertTriangle } from "lucide-react"
 
-const getColorClasses = (color) => {
-  switch (color) {
-    case "primary":
-      return "bg-primary/10 text-primary"
-    case "warning":
-      return "bg-warning/10 text-warning"
-    case "success":
-      return "bg-success/10 text-success"
-    case "destructive":
-      return "bg-destructive/10 text-destructive"
-    default:
-      return "bg-muted text-muted-foreground"
-  }
+const COLOR_CONFIG = {
+  primary:     { card: "stat-card-primary",  icon: "bg-primary/15 text-primary" },
+  warning:     { card: "stat-card-warning",  icon: "bg-warning/15 text-warning" },
+  success:     { card: "stat-card-success",  icon: "bg-success/15 text-success" },
+  destructive: { card: "stat-card-danger",   icon: "bg-destructive/15 text-destructive" },
 }
 
 export function FIRStats() {
-  const [stats, setStats] = useState({
-    total: 0,
-    open: 0,
-    resolved: 0,
-    highPriority: 0,
-  })
+  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Mock FIR data for stats calculation
-        const mockFirs = [
-          { id: "FIR001", status: "open", priority: "high" },
-          { id: "FIR002", status: "open", priority: "medium" },
-          { id: "FIR003", status: "closed", priority: "low" },
-          { id: "FIR004", status: "open", priority: "high" },
-          { id: "FIR005", status: "closed", priority: "high" },
-          { id: "FIR006", status: "open", priority: "low" },
-          { id: "FIR007", status: "closed", priority: "medium" },
-          { id: "FIR008", status: "open", priority: "high" },
-          { id: "FIR009", status: "closed", priority: "high" },
-          { id: "FIR010", status: "open", priority: "medium" },
-        ]
-
-        // Calculate stats from mock data
-        const statsData = {
-          total: mockFirs.length,
-          open: mockFirs.filter((fir) => fir.status === "open").length,
-          resolved: mockFirs.filter((fir) => fir.status === "closed").length,
-          highPriority: mockFirs.filter((fir) => fir.priority === "high").length,
+        const res = await fetch("/api/dashboard/stats")
+        if (res.ok) {
+          const data = await res.json()
+          if (data.success) setStats(data.data)
         }
-
-        setStats(statsData)
-      } catch (error) {
-        console.error("Error calculating stats:", error)
+      } catch (err) {
+        console.error("FIR Stats fetch error:", err)
       } finally {
         setLoading(false)
       }
     }
-
     fetchStats()
   }, [])
 
   const statCards = [
     {
       title: "Total FIRs",
-      value: stats.total.toLocaleString(),
-      subtitle: "All records",
+      value: stats?.totalFIRsAll ?? 0,
+      subtitle: "All time records",
       icon: FileText,
       color: "primary",
     },
     {
       title: "Open Cases",
-      value: stats.open.toLocaleString(),
+      value: stats?.openCases ?? 0,
       subtitle: "Pending review",
       icon: Clock,
       color: "warning",
     },
     {
       title: "Resolved",
-      value: stats.resolved.toLocaleString(),
-      subtitle: "Closed cases",
+      value: stats?.closedCases ?? 0,
+      subtitle: `${stats?.resolutionRate ?? 0}% resolution rate`,
       icon: CheckCircle,
       color: "success",
     },
     {
       title: "High Priority",
-      value: stats.highPriority.toLocaleString(),
+      value: stats?.highPriority ?? 0,
       subtitle: "Requires attention",
       icon: AlertTriangle,
       color: "destructive",
@@ -97,24 +64,35 @@ export function FIRStats() {
 
   return (
     <div className="grid gap-4 md:grid-cols-4">
-      {statCards.map((stat) => (
-        <Card key={stat.title} className="bg-card border-border">
-          <CardContent className="p-4">
+      {statCards.map((stat, i) => {
+        const cfg = COLOR_CONFIG[stat.color] || COLOR_CONFIG.primary
+        return (
+          <div
+            key={stat.title}
+            className={`rounded-xl p-4 card-lift fade-in ${cfg.card}`}
+            style={{ animationDelay: `${i * 70}ms` }}
+          >
             <div className="flex items-center gap-4">
-              <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${getColorClasses(stat.color)}`}>
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${cfg.icon}`}>
                 <stat.icon className="h-6 w-6" />
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-foreground">
-                  {loading ? "-" : stat.value}
+              <div className="min-w-0">
+                <h3 className="text-2xl font-bold text-foreground tabular-nums">
+                  {loading ? (
+                    <span className="skeleton inline-block h-7 w-14 rounded" />
+                  ) : (
+                    stat.value.toLocaleString()
+                  )}
                 </h3>
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-xs text-muted-foreground/70">{stat.subtitle}</p>
+                <p className="text-sm font-medium text-foreground/70">{stat.title}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {loading ? "—" : stat.subtitle}
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      ))}
+          </div>
+        )
+      })}
     </div>
   )
 }

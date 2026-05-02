@@ -4,191 +4,178 @@ import { useState, useEffect } from "react"
 import { AppShell } from "@/components/layout/app-shell"
 import { CrimeAnalyticsFiltered } from "@/components/analytics/crime-analytics-filtered"
 import { PredictiveInsightsAnalytics } from "@/components/analytics/predictive-insights-analytics"
-import { Card, CardContent } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, Target, AlertCircle } from "lucide-react"
+import {
+  TrendingUp, TrendingDown, Target, AlertCircle,
+  Loader2, BarChart3,
+} from "lucide-react"
 
-const analyticsStats = [
-  {
-    title: "Total Incidents",
-    value: "4,287",
-    change: "+8.2%",
-    trend: "up",
-    icon: AlertCircle,
-    color: "primary",
-  },
-  {
-    title: "Resolution Rate",
-    value: "78.5%",
-    change: "+3.1%",
-    trend: "up",
-    icon: Target,
-    color: "success",
-  },
-  {
-    title: "Avg Response Time",
-    value: "4.2 min",
-    change: "-12%",
-    trend: "down",
-    icon: TrendingDown,
-    color: "warning",
-  },
-  {
-    title: "Predictions Accuracy",
-    value: "89.3%",
-    change: "+2.4%",
-    trend: "up",
-    icon: TrendingUp,
-    color: "primary",
-  },
-]
-
-const getColorClasses = (color) => {
-  switch (color) {
-    case "primary":
-      return "bg-primary/10 text-primary"
-    case "success":
-      return "bg-success/10 text-success"
-    case "warning":
-      return "bg-warning/10 text-warning"
-    default:
-      return "bg-muted text-muted-foreground"
-  }
+const COLOR_CONFIG = {
+  primary: { card: "stat-card-primary",  icon: "bg-primary/15 text-primary" },
+  success: { card: "stat-card-success",  icon: "bg-success/15 text-success" },
+  warning: { card: "stat-card-warning",  icon: "bg-warning/15 text-warning" },
 }
-
-// Sample crime data (replace with real data from API if available)
-const sampleCrimeData = [
-  {
-    "Report Number": "MUM800001",
-    "Date Reported": "2023-10-19",
-    "Date of Occurrence": "2023-10-17",
-    "Time of Occurrence": "18:49:00",
-    "City": "Andheri",
-    "Crime Code": "276",
-    "Crime Description": "Road accident FIR",
-    "Victim Age": "34",
-    "Victim Gender": "Other",
-    "Weapon Used": "None",
-    "Crime Domain": "Violent Crime",
-    "Police Deployed": "7",
-    "Case Closed": "Yes",
-  },
-  {
-    "Report Number": "MUM800002",
-    "Date Reported": "2024-03-04",
-    "Date of Occurrence": "2024-02-28",
-    "Time of Occurrence": "03:04:00",
-    "City": "Andheri",
-    "Crime Code": "882",
-    "Crime Description": "Burglary",
-    "Victim Age": "80",
-    "Victim Gender": "Female",
-    "Weapon Used": "Glass bottle",
-    "Crime Domain": "Traffic",
-    "Police Deployed": "7",
-    "Case Closed": "No",
-  },
-  {
-    "Report Number": "MUM800003",
-    "Date Reported": "2022-09-02",
-    "Date of Occurrence": "2022-09-02",
-    "Time of Occurrence": "13:45:00",
-    "City": "Andheri",
-    "Crime Code": "728",
-    "Crime Description": "Cyber fraud",
-    "Victim Age": "80",
-    "Victim Gender": "Other",
-    "Weapon Used": "None",
-    "Crime Domain": "Property Crime",
-    "Police Deployed": "5",
-    "Case Closed": "No",
-  },
-  {
-    "Report Number": "MUM800004",
-    "Date Reported": "2024-05-10",
-    "Date of Occurrence": "2024-05-09",
-    "Time of Occurrence": "15:30:00",
-    "City": "Dadar",
-    "Crime Code": "115",
-    "Crime Description": "Mobile theft",
-    "Victim Age": "45",
-    "Victim Gender": "Male",
-    "Weapon Used": "None",
-    "Crime Domain": "Cyber Crime",
-    "Police Deployed": "4",
-    "Case Closed": "Yes",
-  },
-  {
-    "Report Number": "MUM800005",
-    "Date Reported": "2024-06-15",
-    "Date of Occurrence": "2024-06-14",
-    "Time of Occurrence": "20:15:00",
-    "City": "Bandra",
-    "Crime Code": "250",
-    "Crime Description": "Assault",
-    "Victim Age": "32",
-    "Victim Gender": "Female",
-    "Weapon Used": "Knife",
-    "Crime Domain": "Violent Crime",
-    "Police Deployed": "6",
-    "Case Closed": "Yes",
-  },
-]
 
 export default function AnalyticsPage() {
   const [crimeData, setCrimeData] = useState([])
+  const [liveStats, setLiveStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Use sample data for now - in production, fetch from API
-    setTimeout(() => {
-      setCrimeData(sampleCrimeData)
-      setLoading(false)
-    }, 500)
+    const fetchData = async () => {
+      try {
+        // Fetch stats and crime data concurrently
+        const [statsRes, firRes] = await Promise.all([
+          fetch("/api/dashboard/stats"),
+          fetch("/api/fir?limit=200&page=1"),
+        ])
+
+        if (statsRes.ok) {
+          const s = await statsRes.json()
+          if (s.success) setLiveStats(s.data)
+        }
+
+        if (firRes.ok) {
+          const f = await firRes.json()
+          if (f.success && f.data?.length > 0) {
+            // Map MongoDB FIR fields → analytics format
+            const mapped = f.data.map(fir => ({
+              "Report Number": fir.firId,
+              "Date Reported": fir.date,
+              "Date of Occurrence": fir.date,
+              "Time of Occurrence": fir.time || "00:00:00",
+              "City": fir.location,
+              "Crime Code": fir.type,
+              "Crime Description": fir.type,
+              "Victim Age": "",
+              "Victim Gender": "",
+              "Weapon Used": "None",
+              "Crime Domain": fir.type,
+              "Police Deployed": "5",
+              "Case Closed": fir.status === "closed" ? "Yes" : "No",
+            }))
+            setCrimeData(mapped)
+          }
+        }
+      } catch (err) {
+        console.error("Analytics fetch error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
   }, [])
+
+  const analyticsStats = liveStats
+    ? [
+        {
+          title: "Total Incidents",
+          value: liveStats.totalFIRsAll?.toLocaleString() ?? "—",
+          change: liveStats.todayChange ?? "—",
+          trendUp: (liveStats.todayChange ?? "").startsWith("+"),
+          icon: AlertCircle,
+          color: "primary",
+        },
+        {
+          title: "Resolution Rate",
+          value: `${liveStats.resolutionRate ?? 0}%`,
+          change: `${liveStats.closedCases ?? 0} closed`,
+          trendUp: parseFloat(liveStats.resolutionRate) > 50,
+          icon: Target,
+          color: "success",
+        },
+        {
+          title: "Open Cases",
+          value: liveStats.openCases?.toLocaleString() ?? "—",
+          change: `${liveStats.investigating ?? 0} investigating`,
+          trendUp: false,
+          icon: TrendingDown,
+          color: "warning",
+        },
+        {
+          title: "High Priority",
+          value: liveStats.highPriority?.toLocaleString() ?? "—",
+          change: "Needs attention",
+          trendUp: false,
+          icon: TrendingUp,
+          color: "primary",
+        },
+      ]
+    : []
 
   return (
     <AppShell>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Crime Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Comprehensive crime data analysis and predictive insights</p>
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
+              Crime Analytics
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Comprehensive crime data analysis and predictive insights
+            </p>
+          </div>
         </div>
 
-        {/* Stats */}
+        {/* Live Stats */}
         <div className="grid gap-4 md:grid-cols-4">
-          {analyticsStats.map((stat) => (
-            <Card key={stat.title} className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${getColorClasses(stat.color)}`}>
-                    <stat.icon className="h-5 w-5" />
+          {loading ? (
+            [1,2,3,4].map(i => (
+              <div key={i} className="rounded-xl p-4 stat-card-primary">
+                <div className="skeleton h-10 w-10 rounded-lg mb-3" />
+                <div className="skeleton h-7 w-16 rounded mb-1" />
+                <div className="skeleton h-3 w-24 rounded" />
+              </div>
+            ))
+          ) : (
+            analyticsStats.map((stat, i) => {
+              const cfg = COLOR_CONFIG[stat.color] || COLOR_CONFIG.primary
+              return (
+                <div
+                  key={stat.title}
+                  className={`rounded-xl p-4 card-lift fade-in ${cfg.card}`}
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${cfg.icon}`}>
+                      <stat.icon className="h-5 w-5" />
+                    </div>
+                    <span className={`text-xs font-semibold rounded-full px-2 py-0.5 ${
+                      stat.trendUp ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
+                    }`}>
+                      {stat.change}
+                    </span>
                   </div>
-                  <span
-                    className={`text-sm ${stat.trend === "up" && stat.color !== "warning"
-                        ? "text-success"
-                        : stat.trend === "down" && stat.color === "warning"
-                          ? "text-success"
-                          : "text-muted-foreground"
-                      }`}
-                  >
-                    {stat.change}
-                  </span>
+                  <h3 className="text-2xl font-bold text-foreground tabular-nums">{stat.value}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">{stat.title}</p>
                 </div>
-                <div className="mt-3">
-                  <h3 className="text-2xl font-bold text-foreground">{stat.value}</h3>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+              )
+            })
+          )}
         </div>
 
-        {/* Data-Driven Analytics Charts */}
-        {!loading && <CrimeAnalyticsFiltered data={crimeData} />}
+        {/* Charts */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64 rounded-xl border border-border bg-card">
+            <div className="flex flex-col items-center gap-3 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm">Loading crime data...</p>
+            </div>
+          </div>
+        ) : crimeData.length > 0 ? (
+          <CrimeAnalyticsFiltered data={crimeData} />
+        ) : (
+          <div className="flex items-center justify-center h-64 rounded-xl border border-border bg-card">
+            <div className="flex flex-col items-center gap-3 text-muted-foreground">
+              <BarChart3 className="h-8 w-8 opacity-30" />
+              <p className="text-sm">No FIR data found. Add some FIRs to see analytics.</p>
+            </div>
+          </div>
+        )}
 
         {/* Predictive Insights */}
-        <div className="mt-8">
+        <div>
           <PredictiveInsightsAnalytics />
         </div>
       </div>
